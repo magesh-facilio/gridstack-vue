@@ -95,34 +95,23 @@ export default {
         }
       }
     })
-    this.eventBus.$on('removed', (id, parentId) => {
-        console.log('remove event: ', id, parentId)
-        if (parentId) {
-            let parent = this.originalLayout.find((w) => w.id == parentId)
-            if (parent) {
-                let child = parent.children.find((cw) => cw.id == id)
-                if (child) {
-                    let childIndex = parent.children.indexOf(child)
-                    parent.children.splice(childIndex, 1)
-                    // parent.children[childIndex].x = 0
-                    // parent.children[childIndex].y = 0
-                    // parent.children[childIndex].w = 0
-                    // parent.children[childIndex].h = 0
-                }
-            }
+    this.eventBus.$on('removed', (id) => {
+        console.log('remove event: ', id)
+        let parent = this.originalLayout.find((w) => w.id == id)
+        if (parent) {
+            let parentIndex = this.originalLayout.indexOf(parent)
+            this.originalLayout.splice(parentIndex, 1)
         }
         else {
-            let parent = this.originalLayout.find((w) => w.id == id)
-            if (parent) {
-                let parentIndex = this.originalLayout.indexOf(parent)
-                this.originalLayout.splice(parentIndex, 1)
-                // console.log('remove event parent: ', parent)
-                // parent.x = 0
-                // parent.y = 0
-                // parent.w = 0
-                // parent.h = 0
-            }
-            console.log('remove event parent: ', this.originalLayout)
+            this.originalLayout.forEach((w) => {
+                if (w.children) {
+                    let child = w.children.find((cw) => cw.id == id)
+                    if (child) {
+                        let childIndex = w.children.indexOf(child)
+                        w.children.splice(childIndex, 1)
+                    }
+                }
+            })
         }
         console.log('originalLayout: ', this.originalLayout)
         this.$emit('update:layout', this.originalLayout)

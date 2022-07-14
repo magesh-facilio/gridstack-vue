@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <button @click="addWidget">Add Widget</button>
+    <button @click="addSection">Add Section</button>
     <button @click="saveWidget">Save</button>
     <GridStack ref="gridstack" :layout.sync="layout">
       <GridStackItem  v-for="(widget, i) in layout" :key="widget.id" :index="i" :id="widget.id" :w="widget.w" :h="widget.h" :x="widget.x" :y="widget.y">
@@ -30,11 +31,15 @@ export default {
   data() {
     return {
       data: 'A',
-      layout: [ { "id": "1657767164721", "x": 0, "y": 2, "w": 12, "h": 2, "children": [ { "id": "1657767170573", "x": 0, "y": 0, "w": 1, "h": 1 }, { "id": "1657773672038", "w": 1, "h": 1, "x": 11, "y": 0 } ] }, { "id": "1657767185305", "x": 8, "y": 0, "w": 1, "h": 2 }, { "id": "1657767175263", "w": 1, "h": 1, "x": 5, "y": 0 }, { "id": "1657767179851", "w": 1, "h": 2, "x": 4, "y": 0 } ],
+      layout: [ { "id": "1657767164721", "x": 0, "y": 2, "w": 12, "h": 2, "children": [ { "id": "1657767185305", "w": 1, "h": 2, "x": 2, "y": 3 }, { "id": "1657788343941", "w": 7, "h": 1, "x": 5, "y": 0 } ] }, { "id": "1657788332370", "x": 0, "y": 0, "w": 12, "h": 2, "children": [ { "id": "1657767175263", "w": 1, "h": 1, "x": 2, "y": 0 }, { "id": "1657788338182", "w": 1, "h": 1, "x": 6, "y": 0 } ] }, { "id": "1657767179851", "x": 2, "y": 4, "w": 1, "h": 1 }, { "id": "1657767170573", "w": 4, "h": 3, "x": 4, "y": 4 } ],
       layout1: [
         {id: '1657767164721', x: 0, y: 0, w: 12, h: 2, children: [
           {id: '1657767170573', x: 0, y: 0, w: 1, h: 1,},
           {id: '1657767175263', x: 1, y: 1, w: 1, h: 1,}
+        ]},
+        {id: '1657788332370', x: 0, y: 0, w: 12, h: 2, children: [
+          {id: '1657788338182', x: 0, y: 0, w: 1, h: 1,},
+          {id: '1657788343941', x: 1, y: 1, w: 1, h: 1,}
         ]},
         {id: '1657767179851', x: 2, y: 4, w: 1, h: 1},
         {id: '1657767185305', x: 3, y: 4, w: 1, h: 2}
@@ -51,6 +56,9 @@ export default {
   methods: {
     addWidget() {
       this.layout.push({id: Date.now() + '', x: 2, y: 1, w: 1, h: 1})
+    },
+    addSection() {
+      this.layout.push({id: Date.now() + '', x: 2, y: 1, w: 12, h: 1, children: []})
     },
     saveWidget() {
       console.log(this.layout)

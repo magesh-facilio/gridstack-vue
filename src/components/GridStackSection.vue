@@ -21,12 +21,20 @@ export default {
     mounted() {
         console.log('section added: ', this.eventBus)
         if (this.layout.grid) {
-            this.grid = GridStack.init({
-                acceptWidgets: true,
+            this.grid = GridStack.addGrid(this.$el, {
+                acceptWidgets: (el) => {
+                    let stackElm = el.getElementsByClassName('grid-stack')
+                    if (stackElm && stackElm.length) {
+                        return false
+                    }
+                    else {
+                        return true
+                    }
+                },
                 minRow: 2,
                 resizable: {
                     handles: 'e,se,s,sw,w'
-                }}, this.$el)
+                }})
             this.grid.on('added', (event, items) => {
                 console.log('widget added to sub grid', event.detail[0].id)
                 items.forEach((item) => {
