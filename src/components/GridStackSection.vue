@@ -19,11 +19,11 @@ export default {
         }
     },
     mounted() {
-        console.log('section added: ', this.eventBus)
         if (this.layout.grid) {
-            this.grid = GridStack.addGrid(this.$el, {
+            let gridOptions = Object.assign(this.layout.gridOptions, {
                 acceptWidgets: (el) => {
                     let stackElm = el.getElementsByClassName('grid-stack')
+                    console.log('stackElm: ', stackElm)
                     if (stackElm && stackElm.length) {
                         return false
                     }
@@ -32,9 +32,10 @@ export default {
                     }
                 },
                 minRow: 2,
-                resizable: {
-                    handles: 'e,se,s,sw,w'
-                }})
+            })
+            console.log('section added: ', gridOptions)
+
+            this.grid = GridStack.addGrid(this.$el, gridOptions)
             this.grid.on('added', (event, items) => {
                 console.log('widget added to sub grid', event.detail[0].id)
                 items.forEach((item) => {

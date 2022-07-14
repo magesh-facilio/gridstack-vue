@@ -3,18 +3,19 @@
     <button @click="addWidget">Add Widget</button>
     <button @click="addSection">Add Section</button>
     <button @click="saveWidget">Save</button>
-    <GridStack ref="gridstack" :layout.sync="layout">
-      <GridStackItem  v-for="(widget, i) in layout" :key="widget.id" :index="i" :id="widget.id" :w="widget.w" :h="widget.h" :x="widget.x" :y="widget.y">
-        <GridStackSection :id="widget.id" :section="widget" v-if="widget.children">
-          <GridStackItem v-for="(child, j) in widget.children" :key="child.id" :sub="true" :index="j" :id="child.id" :parentId="widget.id" :w="child.w" :h="child.h" :x="child.x" :y="child.y">
+    <GridStack ref="gridstack" dragHandle=".widget-header" :layout.sync="layout">
+      <GridStackItem  v-for="widget in layout" :key="widget.id" :id="widget.id" :w="widget.w" :h="widget.h" :x="widget.x" :y="widget.y">
+      <SampleWidget v-if="widget.children" @remove="removeWidget(widget.id)">
+        <GridStackSection :id="widget.id" :section="widget">
+          <GridStackItem v-for="child in widget.children" :key="child.id" :id="child.id" :parentId="widget.id" :w="child.w" :h="child.h" :x="child.x" :y="child.y">
             <div>
-              {{child.id}} <button @click="removeWidgetEntry(child.id, widget.id)">Remove</button>
+              <SampleWidget @remove="removeWidget(child.id, widget.id)">Content</SampleWidget>
             </div>
           </GridStackItem>
-          {{widget.id}} <button @click="removeWidgetEntry(widget.id)">Remove</button>
         </GridStackSection>
+        </SampleWidget>
         <div v-else>
-          {{widget.id}} <button @click="removeWidgetEntry(widget.id)">Remove</button>
+          <SampleWidget @remove="removeWidget(widget.id)">Content</SampleWidget>
         </div>
       </GridStackItem>
     </GridStack>
@@ -25,24 +26,17 @@
 import GridStack from "./components/GridStack.vue"
 import GridStackItem from "./components/GridStackItem.vue"
 import GridStackSection from "./components/GridStackSection.vue"
+import SampleWidget from "./SampleWidget.vue"
 export default {
   name: 'App',
-  components: {GridStack, GridStackItem, GridStackSection},
+  components: {GridStack, GridStackItem, GridStackSection, SampleWidget},
   data() {
     return {
       data: 'A',
       layout: [ { "id": "1657767164721", "x": 0, "y": 2, "w": 12, "h": 2, "children": [ { "id": "1657767185305", "w": 1, "h": 2, "x": 2, "y": 3 }, { "id": "1657788343941", "w": 7, "h": 1, "x": 5, "y": 0 } ] }, { "id": "1657788332370", "x": 0, "y": 0, "w": 12, "h": 2, "children": [ { "id": "1657767175263", "w": 1, "h": 1, "x": 2, "y": 0 }, { "id": "1657788338182", "w": 1, "h": 1, "x": 6, "y": 0 } ] }, { "id": "1657767179851", "x": 2, "y": 4, "w": 1, "h": 1 }, { "id": "1657767170573", "w": 4, "h": 3, "x": 4, "y": 4 } ],
       layout1: [
-        {id: '1657767164721', x: 0, y: 0, w: 12, h: 2, children: [
-          {id: '1657767170573', x: 0, y: 0, w: 1, h: 1,},
-          {id: '1657767175263', x: 1, y: 1, w: 1, h: 1,}
-        ]},
-        {id: '1657788332370', x: 0, y: 0, w: 12, h: 2, children: [
-          {id: '1657788338182', x: 0, y: 0, w: 1, h: 1,},
-          {id: '1657788343941', x: 1, y: 1, w: 1, h: 1,}
-        ]},
-        {id: '1657767179851', x: 2, y: 4, w: 1, h: 1},
-        {id: '1657767185305', x: 3, y: 4, w: 1, h: 2}
+        {id: '1657767179851', x: 2, y: 4, w: 24, h: 1},
+        {id: '1657767185305', x: 3, y: 4, w: 12, h: 2}
       ]
     }
   },
@@ -63,7 +57,7 @@ export default {
     saveWidget() {
       console.log(this.layout)
     },
-    removeWidgetEntry(id, parentId) {
+    removeWidget(id, parentId) {
       this.$refs.gridstack.removeWidget(id, parentId)
     }
   }
@@ -71,9 +65,15 @@ export default {
 </script>
 
 <style>
-.grid-stack-item {
+.grid-stack-item-content {
   background: black;
   color: white;
-  border: 1px solid white;
+  border: 1px solid cornflowerblue;
+}
+.widget-header {
+    height: 25px;
+    background: cornflowerblue;
+    color: black;
+    cursor: move;
 }
 </style>

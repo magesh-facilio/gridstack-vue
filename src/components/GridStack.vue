@@ -11,7 +11,54 @@ import 'gridstack/dist/h5/gridstack-dd-native';
 import Vue from 'vue'
 export default {
   name: 'App',
-  props: ['layout'],
+  props: {
+    column: {
+        type: Number,
+        default: 12
+    },
+    rowHeight: {
+        type: String,
+        default: 'auto'
+    },
+    maxRows: {
+        type: Number,
+        default: 0
+    },
+    minRows: {
+        type: Number,
+        default: 0
+    },
+    margin: {
+        default: function () {
+            return 10;
+        }
+    },
+    resizable: {
+        default: function () {
+            return {autoHide: true, handles: 'se'}
+        }
+    },
+    layout: {
+        type: Array,
+        required: true,
+    },
+    static: {
+        type: Boolean,
+        default: false
+    },
+    alwaysShowResizeHandle: {
+        type: Boolean,
+        default: false
+    },
+    className: {
+        type: String,
+        default: ''
+    },
+    dragHandle: {
+        type: String,
+        default: '.grid-stack-item-content'
+    }
+  },
   data() {
     return {
         eventBus: new Vue(),
@@ -26,18 +73,27 @@ export default {
         sublayout: null
     }
   },
+  computed: {
+    gridOptions() {
+        return {
+            column: this.column,
+            cellHeight: this.rowHeight,
+            margin: this.margin,
+            maxRow: this.maxRows,
+            minRow: this.minRows,
+            resizable: this.resizable,
+            staticGrid: this.static,
+            alwaysShowResizeHandle: this.alwaysShowResizeHandle,
+            class: this.className,
+            handle: this.dragHandle
+        }
+    }
+  },
   mounted() {   
-    // .eventBus = new Vue()
     this.originalLayout = this.layout
-    // this._provided.eventBus = this.eventBus
 
-    this.grid = GridStack.init({
-      column: 12,
-      resizable: {
-        handles: 'e,se,s,sw,w'
-      },
-      acceptWidgets: true
-    });
+    let gridOptions = Object.assign({acceptWidgets: true}, this.gridOptions)
+    this.grid = GridStack.init(gridOptions);
     
     this.grid.on('added', (event, items) => {
         console.log('widget added to parent grid', event)
@@ -144,7 +200,7 @@ export default {
   },
   methods: {
     save() {
-      return this.grid.save(false)
+      return this.originalLayout
     },
     getGrid() {
         return this.grid
@@ -155,11 +211,3 @@ export default {
   }
 }
 </script>
-
-<style>
-.grid-stack-item {
-  background: black;
-  color: white;
-  border: 1px solid white;
-}
-  </style>
