@@ -1,4 +1,17 @@
-const { defineConfig } = require('@vue/cli-service')
+const { defineConfig } = require("@vue/cli-service");
 module.exports = defineConfig({
-  transpileDependencies: true
-})
+  configureWebpack: (config) => {
+    config.devtool = "source-map";
+
+    config.output.devtoolModuleFilenameTemplate = (info) => {
+      if (!info.resourcePath.match(/^\.\/\S*?\.vue$/)) {
+        return `webpack-shibi:///${info.resourcePath}`;
+      } else {
+        return "";
+      }
+    };
+
+    config.output.devtoolFallbackModuleFilenameTemplate =
+      "webpack:///[resource-path]?[hash]";
+  },
+});
