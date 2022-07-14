@@ -14,22 +14,22 @@ export default {
   props: ['layout'],
   data() {
     return {
-        eventBus: null,
+        eventBus: new Vue(),
         grid: null,
         originalLayout: null
     }
   },
   provide() {
     return {
-        eventBus: null,
+        eventBus: this.eventBus,
         layout: this,
         sublayout: null
     }
   },
   mounted() {   
-    this.eventBus = new Vue()
+    // .eventBus = new Vue()
     this.originalLayout = this.layout
-    this._provided.eventBus = this.eventBus
+    // this._provided.eventBus = this.eventBus
 
     this.grid = GridStack.init({
       column: 12,
