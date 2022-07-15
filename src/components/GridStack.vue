@@ -9,6 +9,7 @@ import 'gridstack/dist/gridstack.min.css';
 import { GridStack } from 'gridstack';
 import 'gridstack/dist/h5/gridstack-dd-native';
 import Vue from 'vue'
+import { findIndex } from "../utils/helper"
 export default {
   name: 'App',
   props: {
@@ -92,7 +93,7 @@ export default {
   mounted() {   
     this.originalLayout = this.layout
 
-    let gridOptions = Object.assign({acceptWidgets: true}, this.gridOptions)
+    let gridOptions = Object.assign(this.gridOptions, {acceptWidgets: true})
     this.grid = GridStack.init(gridOptions);
     
     this.grid.on('added', (event, items) => {
@@ -105,12 +106,6 @@ export default {
                 x: item.x,
                 y: item.y
             })
-        })
-    })
-    this.grid.on('removed', (event, items) => {
-        console.log('widget removed from parent grid', event.detail[0].id)
-        items.forEach((item) => {
-            this.eventBus.$emit('removed', item.id)
         })
     })
     this.grid.on('change', (event, items) => {
@@ -131,69 +126,68 @@ export default {
     })
 
     this.eventBus.$on('added', (id, layout, parentId) => {
-        console.log('add event: ', id, layout, parentId)
-        if (parentId != null) {
-            let parent = this.originalLayout.find((w) => w.id == parentId)
-            if (parent) {
-                let ex = parent.children.find((w) => w.id == id)
-                console.log('add event ex: ', ex)
-                if (!ex) {
-                    parent.children.push(layout)
-                    this.$emit('update:layout', this.originalLayout)
-                }
-            }
+        console.log('add event: ', id, layout, parentId, this.originalLayout)
+        let widgetIndex = findIndex(this.originalLayout, id)
+        let parentIndex = findIndex(this.originalLayout, parentId)
+
+        if (parentId == null && widgetIndex[1] < 0) {
+            // already this widget in parent only
+            console.log('already this widget in parent only')
+            return
         }
-      else {
-        let parent = this.originalLayout.find((w) => w.id == id)
-        if (!parent) {
-            this.originalLayout.push(layout)
-            this.$emit('update:layout', this.originalLayout)
+        else if (widgetIndex[0] == parentIndex[0]) {
+            // widget exists in same parent
+            console.log('widget exists in same parent')
+            return
         }
-      }
+        else if (parentId == null && widgetIndex[1] >= 0) {
+            // widget moving from subgrid to parent
+            console.log('widget moving from subgrid to parent')
+            widgetIndex[2] = Object.assign(widgetIndex[2], layout)
+            this.originalLayout[widgetIndex[0]].children.splice(widgetIndex[1], 1)
+            this.originalLayout.push(widgetIndex[2])
+        }
+        else if (parentId != null && widgetIndex[1] < 0) {
+            // widget moving from parent to subgrid
+            console.log('widget moving from parent to subgrid')
+            widgetIndex[2] = Object.assign(widgetIndex[2], layout)
+            this.originalLayout.splice(widgetIndex[0], 1)
+            this.originalLayout[parentIndex[0]].children.push(widgetIndex[2])
+        }
+        else {
+            // widget moving between subgrids
+            console.log('widget moving between subgrids')
+            widgetIndex[2] = Object.assign(widgetIndex[2], layout)
+            this.originalLayout[widgetIndex[0]].children.splice(widgetIndex[1], 1)
+            this.originalLayout[parentIndex[0]].children.push(widgetIndex[2])
+        }
+        this.$emit('update:layout', this.originalLayout)
     })
     this.eventBus.$on('removed', (id) => {
         console.log('remove event: ', id)
-        let parent = this.originalLayout.find((w) => w.id == id)
-        if (parent) {
-            let parentIndex = this.originalLayout.indexOf(parent)
-            this.originalLayout.splice(parentIndex, 1)
+        let widgetIndex = findIndex(this.originalLayout, id)
+        if (widgetIndex[0] < 0 && widgetIndex[1] < 0) {
+            return
+        }
+        if (widgetIndex[1] >= 0) {
+            this.originalLayout[widgetIndex[0]].children.splice(widgetIndex[1], 1)
         }
         else {
-            this.originalLayout.forEach((w) => {
-                if (w.children) {
-                    let child = w.children.find((cw) => cw.id == id)
-                    if (child) {
-                        let childIndex = w.children.indexOf(child)
-                        w.children.splice(childIndex, 1)
-                    }
-                }
-            })
+            this.originalLayout.splice(widgetIndex[0], 1)
         }
-        console.log('originalLayout: ', this.originalLayout)
         this.$emit('update:layout', this.originalLayout)
     })
     this.eventBus.$on('changed', (id, layout, parentId) => {
-        console.log('change event: ', id, layout, parentId)
-        if (parentId) {
-            let parent = this.originalLayout.find((w) => w.id == parentId)
-            if (parent) {
-                let ex = parent.children.find((w) => w.id == id)
-                if (ex) {
-                    ex.x = layout.x
-                    ex.y = layout.y
-                    ex.w = layout.w
-                    ex.h = layout.h
-                }
-            }
+        let widgetIndex = findIndex(this.originalLayout, id)
+        console.log('change event: ', id, layout, parentId, widgetIndex)
+        if (widgetIndex[0] < 0 && widgetIndex[1] < 0) {
+            return
+        }
+        if (widgetIndex[1] >= 0) {
+            this.originalLayout[widgetIndex[0]].children[widgetIndex[1]] = Object.assign(this.originalLayout[widgetIndex[0]].children[widgetIndex[1]], layout)
         }
         else {
-            let ex = this.originalLayout.find((w) => w.id == id)
-            if (ex) {
-                ex.x = layout.x
-                ex.y = layout.y
-                ex.w = layout.w
-                ex.h = layout.h
-            }
+            this.originalLayout[widgetIndex[0]] = Object.assign(this.originalLayout[widgetIndex[0]], layout)
         }
         this.$emit('update:layout', this.originalLayout)
     })

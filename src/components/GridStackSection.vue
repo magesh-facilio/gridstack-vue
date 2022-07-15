@@ -48,12 +48,6 @@ export default {
                     }, this.id)
                 })
             })
-            this.grid.on('removed', (event, items) => {
-                console.log('widget removed from sub grid', event.detail[0].id)
-                items.forEach((item) => {
-                    this.eventBus.$emit('removed', item.id, this.id)
-                })
-            })
             this.grid.on('change', (event, items) => {
                 console.log('widget changed from sub grid', event.detail[0].id)
                 let changedLayout = this.grid.save(false)

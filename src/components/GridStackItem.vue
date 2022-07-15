@@ -63,7 +63,7 @@ export default {
     },
     inject: ['eventBus', 'layout', 'sublayout'],
     mounted() {
-        console.log('added: ', this.$el, this.grid, this.layout.grid, this.sublayout)
+        console.log('added: ', this.$el, this.layout.grid, this.sublayout)
         if (this.sublayout) {
             this.sublayout.grid.makeWidget(this.$el)
         }
@@ -72,7 +72,7 @@ export default {
         }
     },
     beforeDestroy() {
-        console.log('removing: ', this.$el, this.grid)
+        console.log('removing: ', this.$el)
         if (this.sublayout) {
             this.sublayout.grid.removeWidget(this.$el, false, false)
         }
