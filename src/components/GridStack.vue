@@ -18,8 +18,8 @@ export default {
         default: 12
     },
     rowHeight: {
-        type: String,
-        default: 'auto'
+        type: Number,
+        default: 15, // 15 is a magic number, for 96
     },
     maxRows: {
         type: Number,
@@ -28,7 +28,11 @@ export default {
     minRows: {
         type: Number,
         default: 0
-    },
+    ,
+    float: {
+        type: String,
+        default: true,
+    }
     margin: {
         default: function () {
             return 10;
