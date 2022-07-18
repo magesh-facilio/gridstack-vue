@@ -39,6 +39,10 @@ export default {
             return {autoHide: true, handles: 'se'}
         }
     },
+    disableOneColumnMode: {
+        type: Boolean,
+        default: true
+    }
     layout: {
         type: Array,
         required: true,
